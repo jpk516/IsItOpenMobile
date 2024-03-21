@@ -58,7 +58,7 @@ struct CheckInFormSheet: View {
                 }
             }
             .navigationTitle("Check In")
-            .navigationBarItems(trailing: Button("Done") {
+            .navigationBarItems(trailing: Button("Back") {
                 showingFormSheet = false
             })
         }

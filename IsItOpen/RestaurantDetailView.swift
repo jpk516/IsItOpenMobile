@@ -119,6 +119,7 @@ struct RestaurantDetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
+                
             }
             .padding()
         }
