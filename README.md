@@ -1,7 +1,7 @@
 # Is it Open?
 
 "Is it Open?" is a mobile companion app to the popular web application designed specifically for college students in Columbia, MO. This user-friendly app helps students find bars and food outlets that are currently open, providing them with up-to-date information on operating hours, locations, and available services. Whether you're looking for a late-night snack or planning your next outing, "Is it Open?" has you covered.
-
+# DO NOT CHANGE THE MINIMUM DEPLOYMENT PAST iOS 16.2. I DON'T WANT TO UPDATE MY iPHONE.
 ## Features
 
 - **Real-time Information**: Get the latest updates on which bars and food outlets are open near you.
