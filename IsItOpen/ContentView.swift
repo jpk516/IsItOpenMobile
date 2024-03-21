@@ -1,24 +1,19 @@
 //
 //  ContentView.swift
-//  IsItOpen
+//  iio2
 //
-//  Created by Jimmy Keating on 3/19/24.
+//  Created by Jimmy Keating on 3/21/24.
 //
 
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            HomeView() // The existing content of your ContentView now moved to HomeView
         }
-        .padding()
+        .tabItem {
+            Label("Home", systemImage: "house.fill")
+        }
     }
-}
-
-#Preview {
-    ContentView()
 }
