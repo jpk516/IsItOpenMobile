@@ -15,7 +15,7 @@ struct AppView: View {
                     Label("Home", systemImage: "house.fill")
                 }
             
-            HotView()
+            MyViewController()
                 .tabItem {
                     Label("Hot", systemImage: "flame.fill")
                 }
