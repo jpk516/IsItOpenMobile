@@ -48,6 +48,54 @@ class APIManager {
         task.resume()
     }
     
+    static func fetchDataFromTagAPI(completion: @escaping ([Tags]) -> Void) {
+            guard let url = URL(string: "https://server.whatstarted.com/api/tags") else {
+                print("Invalid URL")
+                return
+            }
+
+            var tagrequest = URLRequest(url: url)
+            tagrequest.httpMethod = "GET" // Set the request method to GET
+
+            let tagtask = URLSession.shared.dataTask(with: tagrequest) { data, response, error in
+                if let error = error {
+                    print("Error: (error)")
+                    return
+                }
+
+                guard let httpTagResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpTagResponse.statusCode) else {
+                    print("Invalid response")
+                    return
+                }
+
+                guard let Tagdata = data else {
+                    print("No Tag data received")
+                    return
+                }
+
+                do {
+                    let jsonArray = try JSONSerialization.jsonObject(with: Tagdata, options: []) as? [[String: Any]]
+
+                    var tags = [Tags]()
+                    if let jsonArray = jsonArray {
+                        for item in jsonArray {
+                            // Parse venue data and create Venue objects
+                            let tag = parseTag(from: item)
+                            tags.append(tag)
+                        }
+                    }
+
+                    completion(tags) // Pass the data to the completion closure
+                } catch {
+                    print("Error parsing JSON: (error)")
+                }
+            }
+
+            tagtask.resume()
+        }
+
+    
     static func parseVenue(from json: [String: Any]) -> Venue {
         // Implement parsing logic to create a Venue object from JSON data
         // This function can be reused if needed in other parts of your code
@@ -88,6 +136,7 @@ class APIManager {
             }
         }
 
+        
         // Parse other properties
         let active = json["active"] as? Bool ?? false
         let createdString = json["created"] as? String ?? ""
@@ -100,6 +149,13 @@ class APIManager {
 
         return Venue(name: name, googlePlaceID: googlePlaceID, description: description, phone: phone, email: email, website: website, image: image, type: type, address: address, city: city, state: state, zip: zip, geo: geo, hours: hours, active: active, created: createdDate, modified: modifiedDate, id: id)
     }
+    //Parsing Tag Data
+        static func parseTag(from json: [String: Any]) -> Tags {
+            let name = json["name"] as? String ?? ""
+            let id = json["_id"] as? String ?? ""
+
+            return Tags(name: name, id: id)
+        }
 }
 
 

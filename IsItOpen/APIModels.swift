@@ -50,4 +50,49 @@ struct Venue: Codable, Identifiable {
           let coordinates: [Double]
           let id: String
       }
+    
   }
+
+struct Tags: Codable {
+    let name: String
+    let id: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case id = "_id"
+    }
+
+}
+//Checkins
+struct CheckIn: Codable {
+    let venue: String
+    let user: String
+    let comment: String
+    let open: Bool
+    let tags: [String]
+    let created: Date
+    let upvoteCount: Int
+    let downvoteCount: Int
+    let votes: [Vote]
+    let hidden: Bool
+    let id: String
+
+    struct Vote: Codable {
+        let user: String
+        let up: Bool
+        let created: Date
+    }
+}
+//Achievments
+struct Achievements: Codable {
+    let name: String
+    let description: String
+    let points: Int
+    let created: Date
+    let id: String
+
+    enum CodingKeys: String, CodingKey {
+        case name, description, points, created
+        case id = "_id"
+    }
+}
