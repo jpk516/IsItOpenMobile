@@ -5,76 +5,32 @@
 //  Created by Jimmy Keating on 4/25/24.
 //
 
-//import Foundation
-//
-//struct CheckItIn: Codable, Identifiable {
-//    let id: String
-//    let venue: Venue
-//    let comment: String?
-//    let open: Bool
-//    let tags: [String]
-//    let user: User
-//    
-//    struct Venue: Codable {
-//        let id: String
-//        let name: String
-//    }
-//    
-//    struct User: Codable {
-//        let username: String
-//    }
-//}
-//
-//class FeedViewModel: ObservableObject {
-//    @Published var isAuthenticated = false
-//    @Published var checkIns: [CheckItIn] = []
-//
-//    func loadCheckIns() {
-//        guard isAuthenticated else { return }
-//        guard let url = URL(string: "https://server.whatstarted.com/api/check-ins/recent/") else { return }
-//        
-//        URLSession.shared.dataTask(with: url) { data, _, error in
-//            if let data = data {
-//                if let decodedResponse = try? JSONDecoder().decode([CheckItIn].self, from: data) {
-//                    DispatchQueue.main.async {
-//                        self.checkIns = decodedResponse
-//                    }
-//                    return
-//                }
-//            }
-//            print("Fetch failed: \(error?.localizedDescription ?? "Unknown error")")
-//        }.resume()
-//    }
-//}
-//
-//
+
 //import SwiftUI
 //
 //struct FeedView: View {
-//    @StateObject private var viewModel = FeedViewModel()
+//    @EnvironmentObject var viewModel: FeedViewModel
 //
 //    var body: some View {
-//        Group {
+//        List(viewModel.checkIns) { checkIn in
+//            VStack(alignment: .leading) {
+//                Text("\(checkIn.user.username) checked in at \(checkIn.venue.name) and reports it's \(checkIn.open ? "still open" : "closed")!")
+//                    .bold()
+//                if !checkIn.tags.isEmpty {
+//                    Text("Tags: \(checkIn.tags.joined(separator: ", "))")
+//                }
+//                if let comment = checkIn.comment, !comment.isEmpty {
+//                    Text("Comment: \(comment)")
+//                }
+//            }
+//            .padding()
+//        }
+//        .navigationTitle("Recent Check-Ins")
+//        .onAppear {
 //            if viewModel.isAuthenticated {
-//                List(viewModel.checkIns) { checkIn in
-//                    VStack(alignment: .leading) {
-//                        Text("\(checkIn.user.username) checked in at \(checkIn.venue.name) and reports it's \(checkIn.open ? "still open" : "closed")!")
-//                            .bold()
-//                        if !checkIn.tags.isEmpty {
-//                            Text("Tags: \(checkIn.tags.joined(separator: ", "))")
-//                        }
-//                        if let comment = checkIn.comment, !comment.isEmpty {
-//                            Text("Comment: \(comment)")
-//                        }
-//                    }
-//                    .padding()
-//                }
-//                .navigationTitle("Recent Check-Ins")
-//                .onAppear {
-//                    viewModel.loadCheckIns()
-//                }
+//                viewModel.loadCheckIns()
 //            } else {
-//                LoginView(isAuthenticated: $viewModel.isAuthenticated)
+//                print("Not authenticated")
 //            }
 //        }
 //    }
@@ -86,26 +42,59 @@ struct FeedView: View {
     @EnvironmentObject var viewModel: FeedViewModel
 
     var body: some View {
-        List(viewModel.checkIns) { checkIn in
-            VStack(alignment: .leading) {
-                Text("\(checkIn.user.username) checked in at \(checkIn.venue.name) and reports it's \(checkIn.open ? "still open" : "closed")!")
-                    .bold()
-                if !checkIn.tags.isEmpty {
-                    Text("Tags: \(checkIn.tags.joined(separator: ", "))")
-                }
-                if let comment = checkIn.comment, !comment.isEmpty {
-                    Text("Comment: \(comment)")
-                }
+        NavigationView {
+            List(viewModel.checkIns) { checkIn in
+                CheckInCard(checkIn: checkIn)
             }
-            .padding()
-        }
-        .navigationTitle("Recent Check-Ins")
-        .onAppear {
-            if viewModel.isAuthenticated {
+            .navigationTitle("Recent Check-Ins")
+            .navigationBarItems(trailing: Button("Refresh") {
                 viewModel.loadCheckIns()
-            } else {
-                print("Not authenticated")
+            })
+            .onAppear {
+                if viewModel.isAuthenticated {
+                    viewModel.loadCheckIns()
+                } else {
+                    print("Not authenticated")
+                }
             }
         }
+    }
+}
+
+struct CheckInCard: View {
+    var checkIn: CheckItIn
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(checkIn.venue.name)
+                    .font(.headline)
+                Spacer()
+                Text(checkIn.open ? "Open" : "Closed")
+                    .foregroundColor(checkIn.open ? .green : .red)
+                    .bold()
+            }
+
+            Text("Checked in by \(checkIn.user.username)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            if let comment = checkIn.comment, !comment.isEmpty {
+                Text("Comment: \(comment)")
+                    .italic()
+            }
+
+            if !checkIn.tags.isEmpty {
+                Text("Tags: \(checkIn.tags.joined(separator: ", "))")
+                    .font(.footnote)
+                    .padding(.top, 5)
+            }
+
+            Divider()
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(10)
+        .shadow(radius: 5)
     }
 }
