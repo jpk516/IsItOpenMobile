@@ -1,8 +1,6 @@
 import Foundation
 
 class APIManager {
-    // deals with gathering data from API
-    //Venues
     static func fetchDataFromAPI(completion: @escaping ([Venue]) -> Void) {
         guard let url = URL(string: "https://server.whatstarted.com/api/venues") else {
             print("Invalid URL")
@@ -49,161 +47,11 @@ class APIManager {
         
         task.resume()
     }
-    //Tags
-    static func fetchDataFromTagAPI(completion: @escaping ([Tags]) -> Void) {
-        guard let url = URL(string: "https://server.whatstarted.com/api/tags") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var tagrequest = URLRequest(url: url)
-        tagrequest.httpMethod = "GET" // Set the request method to GET
-        
-        let tagtask = URLSession.shared.dataTask(with: tagrequest) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-                return
-            }
-            
-            guard let httpTagResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpTagResponse.statusCode) else {
-                print("Invalid response")
-                return
-            }
-            
-            guard let Tagdata = data else {
-                print("No Tag data received")
-                return
-            }
-            
-            do {
-                let jsonArray = try JSONSerialization.jsonObject(with: Tagdata, options: []) as? [[String: Any]]
-                
-                var tags = [Tags]()
-                if let jsonArray = jsonArray {
-                    for item in jsonArray {
-                        // Parse venue data and create Venue objects
-                        let tag = parseTag(from: item)
-                        tags.append(tag)
-                    }
-                }
-                
-                completion(tags) // Pass the data to the completion closure
-            } catch {
-                print("Error parsing JSON: \(error)")
-            }
-        }
-        
-        tagtask.resume()
-    }
     
-    //Checkins
-    static func fetchDataFromCheckInAPI(completion: @escaping ([CheckIn]) -> Void) {
-        guard let url = URL(string: "https://server.whatstarted.com/api/check-ins") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var checkinrequest = URLRequest(url: url)
-        checkinrequest.httpMethod = "GET" // Set the request method to GET
-        
-        let checkintask = URLSession.shared.dataTask(with: checkinrequest) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-                return
-            }
-            
-            guard let httpCheckInResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpCheckInResponse.statusCode) else {
-                print("Invalid response")
-                return
-            }
-            
-            guard let CheckIndata = data else {
-                print("No Tag data received")
-                return
-            }
-            
-            do {
-                let jsonArray = try JSONSerialization.jsonObject(with: CheckIndata, options: []) as? [[String: Any]]
-                
-                var checkinlist = [CheckIn]()
-                if let jsonArray = jsonArray {
-                    for item in jsonArray {
-                        // Parse venue data and create Venue objects
-                        let checkin = parseCheckin(from: item)
-                        checkinlist.append(checkin)
-                    }
-                }
-                
-                completion(checkinlist) // Pass the data to the completion closure
-            } catch {
-                print("Error parsing JSON: \(error)")
-            }
-        }
-        
-        checkintask.resume()
-    }
-    
-    //checkin votes
-
-    
-    
-    //Account Login
-    static func fetchDataLoginAPI(completion: @escaping ([Login]) -> Void) {
-        guard let loginurl = URL(string: "https://server.whatstarted.com/api/accounts/login") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var Accountrequest = URLRequest(url: loginurl)
-        Accountrequest.httpMethod = "GET" // Set the request method to GET
-        
-        let Accounttask = URLSession.shared.dataTask(with: Accountrequest) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-                return
-            }
-            
-            guard let httpAccountResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpAccountResponse.statusCode) else {
-                print("Invalid response")
-                return
-            }
-            
-            guard let Accountdata = data else {
-                print("No Tag data received")
-                return
-            }
-            
-            do {
-                let jsonArray = try JSONSerialization.jsonObject(with: Accountdata, options: []) as? [[String: Any]]
-                
-                var accountlist = [Login]()
-                if let jsonArray = jsonArray {
-                    for item in jsonArray {
-                        // Parse venue data and create Venue objects
-                        let login = parseLogin(from: item)
-                        accountlist.append(login)
-                    }
-                }
-                
-                completion(accountlist) // Pass the data to the completion closure
-            } catch {
-                print("Error parsing JSON: \(error)")
-            }
-        }
-        
-        Accounttask.resume()
-    }
-    //Account Favorites
-    //Achievements
-    //
-    
-//Parsing Data for each Api call
-    
-    //Parsing Venue Data
     static func parseVenue(from json: [String: Any]) -> Venue {
+        // Implement parsing logic to create a Venue object from JSON data
+        // This function can be reused if needed in other parts of your code
+        // Example:
         let name = json["name"] as? String ?? ""
         let googlePlaceID = json["google_place_id"] as? String ?? ""
         let description = json["description"] as? String ?? ""
@@ -239,6 +87,8 @@ class APIManager {
                 hours.append(hour)
             }
         }
+
+        // Parse other properties
         let active = json["active"] as? Bool ?? false
         let createdString = json["created"] as? String ?? ""
         let modifiedString = json["modified"] as? String ?? ""
@@ -250,58 +100,6 @@ class APIManager {
 
         return Venue(name: name, googlePlaceID: googlePlaceID, description: description, phone: phone, email: email, website: website, image: image, type: type, address: address, city: city, state: state, zip: zip, geo: geo, hours: hours, active: active, created: createdDate, modified: modifiedDate, id: id)
     }
-    
-    //Parsing Tag Data
-    static func parseTag(from json: [String: Any]) -> Tags {
-        let name = json["name"] as? String ?? ""
-        let id = json["_id"] as? String ?? ""
-        
-        return Tags(name: name, id: id)
-    }
-    
-    //Parse Login Data
-    static func parseLogin(from json: [String: Any]) -> Login {
-        let username = json["username"] as? String ?? ""
-        let password = json["password"] as? String ?? ""
-
-        return Login(username: username, password: password)
-    }
-    
-    //Parse Checkin Data
-    static func parseCheckin(from json: [String: Any]) -> CheckIn {
-        let venue = json["venue"] as? String ?? ""
-        let user = json["user"] as? String ?? ""
-        let comment = json["comment"] as? String ?? ""
-        let tags = json["tags"] as? [String] ?? []
-        
-        let open = json["open"] as? Bool ?? false
-        let hidden = json["hidden"] as? Bool ?? false
-        
-        let createdString = json["created"] as? String ?? ""
-        let dateFormatter = ISO8601DateFormatter()
-        let created = dateFormatter.date(from: createdString) ?? Date()
-        
-        
-        let upvoteCount = json["upvoteCount"] as? Int ?? 0
-        let downvoteCount = json["downvoteCount"] as? Int ?? 0
-        let id = json["_id"] as? String ?? ""
-        
-        var votes = [CheckIn.Vote]()
-            if let votesData = json["votes"] as? [[String: Any]] {
-                for voteData in votesData {
-                    if let voteUser = voteData["user"] as? String,
-                       let up = voteData["up"] as? Bool,
-                       let createdString = voteData["created"] as? String,
-                       let createdDate = dateFormatter.date(from: createdString) {
-                        let vote = CheckIn.Vote(user: voteUser, up: up, created: createdDate)
-                        votes.append(vote)
-                    }
-                }
-            }
-
-        return CheckIn(venue: venue, user: user, comment: comment, open: open, tags: tags, created: created, upvoteCount: upvoteCount, downvoteCount: downvoteCount, votes: votes, hidden: hidden, id: id)
-    }
 }
-
 
 

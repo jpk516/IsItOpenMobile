@@ -1,36 +1,64 @@
 //
-//  AccountView.swift
-//  iio2
+//  LoginFeedView.swift
+//  IsItOpen
 //
-//  Created by Jimmy Keating on 3/21/24.
+//  Created by Jimmy Keating on 4/25/24.
 //
 
 import SwiftUI
 
-struct LoginView: View {
-    @Binding var isAuthenticated: Bool
+struct LoginFeedView: View {
     @State private var username: String = ""
     @State private var password: String = ""
+    @State private var isAuthenticated: Bool = false
     @State private var showingAlert = false
-    @State private var alertMessage = "Something went wrong. Please try again."
+    @State private var alertMessage: String = ""
+    @StateObject private var feedViewModel = FeedViewModel()
 
     var body: some View {
         NavigationView {
-            Form {
-                TextField("Username", text: $username)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                SecureField("Password", text: $password)
-                
-                Button("Log In") {
-                    login()
+            if isAuthenticated {
+                feedList
+            } else {
+                loginForm
+            }
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Login Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+
+    var loginForm: some View {
+        Form {
+            TextField("Username", text: $username)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+            SecureField("Password", text: $password)
+            Button("Log In") {
+                login()
+            }
+            .disabled(username.isEmpty || password.isEmpty)
+        }
+        .navigationBarTitle("Log In")
+    }
+
+    var feedList: some View {
+        List(feedViewModel.checkIns) { checkIn in
+            VStack(alignment: .leading) {
+                Text("\(checkIn.user.username) checked in at \(checkIn.venue.name) and reports it's \(checkIn.open ? "still open" : "closed")!")
+                    .bold()
+                if !checkIn.tags.isEmpty {
+                    Text("Tags: \(checkIn.tags.joined(separator: ", "))")
                 }
-                .disabled(username.isEmpty || password.isEmpty)
+                if let comment = checkIn.comment, !comment.isEmpty {
+                    Text("Comment: \(comment)")
+                }
             }
-            .navigationBarTitle("Log In")
-            .alert(isPresented: $showingAlert) {
-                Alert(title: Text("Login Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-            }
+            .padding()
+        }
+        .navigationTitle("Recent Check-Ins")
+        .onAppear {
+            feedViewModel.loadCheckIns()
         }
     }
 
@@ -64,7 +92,6 @@ struct LoginView: View {
 
             if let httpResponse = response as? HTTPURLResponse {
                 DispatchQueue.main.async {
-                    print("HTTP Status Code: \(httpResponse.statusCode)") // Logging the HTTP status code
                     if httpResponse.statusCode == 200 {
                         self.isAuthenticated = true
                     } else {

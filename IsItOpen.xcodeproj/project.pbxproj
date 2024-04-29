@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F81F8DE2BE02B4500A61F4D /* CheckInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F81F8DD2BE02B4500A61F4D /* CheckInViewModel.swift */; };
+		8F81F8E02BE02B6900A61F4D /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F81F8DF2BE02B6900A61F4D /* FeedView.swift */; };
+		8F81F8E22BE02BA000A61F4D /* LoginFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F81F8E12BE02BA000A61F4D /* LoginFeedView.swift */; };
+		8F81F8E42BE02BD700A61F4D /* VenueViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F81F8E32BE02BD700A61F4D /* VenueViewModel.swift */; };
 		8FB4EA5B2BAA2223003CC0AD /* IsItOpenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB4EA5A2BAA2223003CC0AD /* IsItOpenApp.swift */; };
 		8FB4EA5D2BAA2223003CC0AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB4EA5C2BAA2223003CC0AD /* ContentView.swift */; };
 		8FB4EA5F2BAA2226003CC0AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8FB4EA5E2BAA2226003CC0AD /* Assets.xcassets */; };
@@ -44,6 +48,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8F81F8DD2BE02B4500A61F4D /* CheckInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInViewModel.swift; sourceTree = "<group>"; };
+		8F81F8DF2BE02B6900A61F4D /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		8F81F8E12BE02BA000A61F4D /* LoginFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeedView.swift; sourceTree = "<group>"; };
+		8F81F8E32BE02BD700A61F4D /* VenueViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueViewModel.swift; sourceTree = "<group>"; };
 		8FB4EA572BAA2223003CC0AD /* IsItOpen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IsItOpen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FB4EA5A2BAA2223003CC0AD /* IsItOpenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsItOpenApp.swift; sourceTree = "<group>"; };
 		8FB4EA5C2BAA2223003CC0AD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -128,6 +136,10 @@
 				B03DC7912BDABE09003B40FF /* APIManager.swift */,
 				B03DC7932BDAC12E003B40FF /* APIModels.swift */,
 				B03DC7952BDB4A4C003B40FF /* APIDeletes.swift */,
+				8F81F8DD2BE02B4500A61F4D /* CheckInViewModel.swift */,
+				8F81F8DF2BE02B6900A61F4D /* FeedView.swift */,
+				8F81F8E12BE02BA000A61F4D /* LoginFeedView.swift */,
+				8F81F8E32BE02BD700A61F4D /* VenueViewModel.swift */,
 			);
 			path = IsItOpen;
 			sourceTree = "<group>";
@@ -287,10 +299,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F81F8E02BE02B6900A61F4D /* FeedView.swift in Sources */,
 				8FF700BD2BAC1D0C008F36B1 /* AccountView.swift in Sources */,
 				8FB4EA5D2BAA2223003CC0AD /* ContentView.swift in Sources */,
 				B03DC7922BDABE09003B40FF /* APIManager.swift in Sources */,
 				8FF700BF2BAC1D0C008F36B1 /* RestaurantDetailView.swift in Sources */,
+				8F81F8DE2BE02B4500A61F4D /* CheckInViewModel.swift in Sources */,
 				B03DC7942BDAC12E003B40FF /* APIModels.swift in Sources */,
 				8FF700C02BAC1D0C008F36B1 /* AppView.swift in Sources */,
 				8FF700B62BAC1CE3008F36B1 /* Restaurant.swift in Sources */,
@@ -299,6 +313,8 @@
 				8FF700BE2BAC1D0C008F36B1 /* HomeView.swift in Sources */,
 				8FF700C12BAC1D0C008F36B1 /* HotView.swift in Sources */,
 				8FB4EA5B2BAA2223003CC0AD /* IsItOpenApp.swift in Sources */,
+				8F81F8E42BE02BD700A61F4D /* VenueViewModel.swift in Sources */,
+				8F81F8E22BE02BA000A61F4D /* LoginFeedView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
