@@ -4,37 +4,7 @@
 //
 //  Created by Jimmy Keating on 4/25/24.
 //
-
-
-//import SwiftUI
 //
-//struct FeedView: View {
-//    @EnvironmentObject var viewModel: FeedViewModel
-//
-//    var body: some View {
-//        List(viewModel.checkIns) { checkIn in
-//            VStack(alignment: .leading) {
-//                Text("\(checkIn.user.username) checked in at \(checkIn.venue.name) and reports it's \(checkIn.open ? "still open" : "closed")!")
-//                    .bold()
-//                if !checkIn.tags.isEmpty {
-//                    Text("Tags: \(checkIn.tags.joined(separator: ", "))")
-//                }
-//                if let comment = checkIn.comment, !comment.isEmpty {
-//                    Text("Comment: \(comment)")
-//                }
-//            }
-//            .padding()
-//        }
-//        .navigationTitle("Recent Check-Ins")
-//        .onAppear {
-//            if viewModel.isAuthenticated {
-//                viewModel.loadCheckIns()
-//            } else {
-//                print("Not authenticated")
-//            }
-//        }
-//    }
-//}
 
 import SwiftUI
 
@@ -70,6 +40,14 @@ struct CheckInCard: View {
                 Text(checkIn.venue.name)
                     .font(.headline)
                 Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: "hand.thumbsup.fill")
+                            .foregroundColor(.green)
+                        Text("\(checkIn.upvoteCount)")
+                        Image(systemName: "hand.thumbsdown.fill")
+                            .foregroundColor(.red)
+                        Text("\(checkIn.downvoteCount)")
+                    }
                 Text(checkIn.open ? "Open" : "Closed")
                     .foregroundColor(checkIn.open ? .green : .red)
                     .bold()
@@ -98,3 +76,4 @@ struct CheckInCard: View {
         .shadow(radius: 5)
     }
 }
+

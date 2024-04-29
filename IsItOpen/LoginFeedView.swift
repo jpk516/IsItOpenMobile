@@ -115,24 +115,7 @@ class FeedViewModel: ObservableObject {
     }
 }
 
-//
-//struct CheckItIn: Codable, Identifiable {
-//    let id: String
-//    let venue: Venue
-//    let comment: String?
-//    let open: Bool
-//    let tags: [String]
-//    let user: User
-//
-//    struct Venue: Codable {
-//        let id: String
-//        let name: String
-//    }
-//
-//    struct User: Codable {
-//        let username: String
-//    }
-//}
+
 
 struct CheckItIn: Codable, Identifiable {
     let id: String

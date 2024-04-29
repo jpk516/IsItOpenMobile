@@ -1,16 +1,15 @@
 //
-//  HomeView.swift
-//  iio2
+//  FavoritesView.swift
+//  IsItOpen
 //
-//  Created by Jimmy Keating on 3/21/24.
+//  Created by Jimmy Keating on 4/29/24.
 //
-
 
 import SwiftUI
 import CoreLocation
 import MapKit
 
-struct HomeView: View {
+struct FavoritesView: View {
     @StateObject var venueViewModel = VenueViewModel() // ViewModel to manage venue data
     @State private var showingDetail = false
     @State private var selectedVenue: Venue?
@@ -43,7 +42,7 @@ struct HomeView: View {
 }
 
 
-struct VenueDetailView: View {
+struct FavoritesDetailView: View {
     var venue: Venue
     @Binding var showingDetail: Bool
     // State to control the visibility of additional sheets or actions
@@ -151,38 +150,6 @@ struct VenueDetailView: View {
 
 }
 
-// MapView would be a separate SwiftUI view that handles rendering the map based on venue's coordinates.
-struct MapView: View {
-    var venue: Venue
 
-    var body: some View {
-        Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: venue.geo.coordinates[1], longitude: venue.geo.coordinates[0]), span: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.0005))), annotationItems: [venue]) { place in
-            MapPin(coordinate: CLLocationCoordinate2D(latitude: place.geo.coordinates[1], longitude: place.geo.coordinates[0]), tint: .red)
-        }
-        .onAppear {
-            MKMapView.appearance().mapType = .satellite
-        }
-    }
-}
-
-
-struct MultipleSelectionRow: View {
-    var title: String
-    var isSelected: Bool
-    var action: () -> Void
-
-    var body: some View {
-        Button(action: self.action) {
-            HStack {
-                Text(self.title)
-                Spacer()
-                if self.isSelected {
-                    Image(systemName: "checkmark").foregroundColor(.blue)
-                }
-            }
-        }
-        .foregroundColor(.primary)
-    }
-}
 
 

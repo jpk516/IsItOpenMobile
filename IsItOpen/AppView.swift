@@ -18,9 +18,9 @@ struct AppView: View {
                 .tabItem {
                     Label("Feed", systemImage: "fork.knife")
                 }
-            HotView()
+            FavoritesView()
                 .tabItem {
-                    Label("What's Hot", systemImage: "flame.fill")
+                    Label("Favorites", systemImage: "heart.fill")
                 }
             
 
