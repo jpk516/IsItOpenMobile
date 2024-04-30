@@ -18,8 +18,12 @@ struct AppView: View {
                 .tabItem {
                     Label("Feed", systemImage: "fork.knife")
                 }
-            FavoritesView()
+            AccountView()
                 .tabItem {
+                    Label("Profile", systemImage: "person.fill")
+                }
+            FavoritesView()
+                .tabItem{
                     Label("Favorites", systemImage: "heart.fill")
                 }
             

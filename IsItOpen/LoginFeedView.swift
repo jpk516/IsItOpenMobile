@@ -1,45 +1,45 @@
+////
+////  LoginFeedView.swift
+////  IsItOpen
+////
+////  Created by Jimmy Keating on 4/25/24.
+////
 //
-//  LoginFeedView.swift
-//  IsItOpen
+//import SwiftUI
 //
-//  Created by Jimmy Keating on 4/25/24.
+//struct LoginFeedView: View {
+//    @State private var username: String = ""
+//    @State private var password: String = ""
+//    @StateObject private var feedViewModel = FeedViewModel()
 //
-
-import SwiftUI
-
-struct LoginFeedView: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
-    @StateObject private var feedViewModel = FeedViewModel()
-
-    var body: some View {
-        NavigationView {
-            if feedViewModel.isAuthenticated {
-                FeedView().environmentObject(feedViewModel)
-            } else {
-                loginForm
-            }
-        }
-    }
-
-    var loginForm: some View {
-        Form {
-            TextField("Username", text: $username)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-            SecureField("Password", text: $password)
-            Button("Log In") {
-                feedViewModel.authenticate(username: username, password: password)
-            }
-            .disabled(username.isEmpty || password.isEmpty)
-        }
-        .navigationBarTitle("Log In")
-    }
-}
-
-
-import Foundation
-
+//    var body: some View {
+//        NavigationView {
+//            if feedViewModel.isAuthenticated {
+//                FeedView().environmentObject(feedViewModel)
+//            } else {
+//                loginForm
+//            }
+//        }
+//    }
+//
+//    var loginForm: some View {
+//        Form {
+//            TextField("Username", text: $username)
+//                .autocapitalization(.none)
+//                .disableAutocorrection(true)
+//            SecureField("Password", text: $password)
+//            Button("Log In") {
+//                feedViewModel.authenticate(username: username, password: password)
+//            }
+//            .disabled(username.isEmpty || password.isEmpty)
+//        }
+//        .navigationBarTitle("Log In")
+//    }
+//}
+//
+//
+//import Foundation
+//
 class FeedViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var checkIns: [CheckItIn] = []
@@ -175,3 +175,57 @@ struct CheckItIn: Codable, Identifiable {
     }
 }
 
+
+import SwiftUI
+
+struct LoginFeedView: View {
+    @EnvironmentObject var feedViewModel: FeedViewModel
+    @State private var username: String = ""
+    @State private var password: String = ""
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                if feedViewModel.isAuthenticated {
+                    FeedView()
+                } else {
+                    loginForm
+                }
+            }
+            .navigationBarHidden(true)
+        }
+    }
+
+    var loginForm: some View {
+        Form {
+            Section(header: Text("Please log in to continue")) {
+                TextField("Username", text: $username)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                SecureField("Password", text: $password)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                Button("Log In") {
+                    feedViewModel.authenticate(username: username, password: password)
+                }
+                .disabled(username.isEmpty || password.isEmpty)
+                .buttonStyle(RoundedRectangleButtonStyle())
+            }
+        }
+        .navigationBarTitle("Log In", displayMode: .inline)
+    }
+}
+
+// Custom button style for a nicer UI
+struct RoundedRectangleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+    }
+}

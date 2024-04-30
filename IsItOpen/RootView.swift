@@ -7,12 +7,27 @@
 
 import SwiftUI
 
-struct RootView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+//struct RootView: View {
+//    @EnvironmentObject var viewModel: FeedViewModel  // Access the shared FeedViewModel instance
+//
+//    var body: some View {
+//        if viewModel.isAuthenticated {
+//            FeedView().environmentObject(viewModel)  // Pass the ViewModel to the FeedView
+//        } else {
+//            LoginFeedView().environmentObject(viewModel)  // Pass the ViewModel to the LoginFeedView
+//        }
+//    }
+//}
+import SwiftUI
 
-#Preview {
-    RootView()
+struct RootView: View {
+    @EnvironmentObject var viewModel: FeedViewModel
+
+    var body: some View {
+        if viewModel.isAuthenticated {
+            AppView() // Navigate to HomeView if authenticated
+        } else {
+            LoginFeedView() // Show LoginFeedView if not authenticated
+        }
+    }
 }

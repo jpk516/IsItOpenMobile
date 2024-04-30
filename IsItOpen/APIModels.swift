@@ -80,13 +80,14 @@ struct Achievements: Codable {
     let created: Date
     let id: String
 
+    
     enum CodingKeys: String, CodingKey {
         case name, description, points, created
         case id = "_id"
     }
 }
 
-struct Favorites: Codable{
+struct Favorites: Codable, Identifiable{
     let name: String
     let googlePlaceID: String
     let description: String
@@ -119,3 +120,30 @@ struct Favorites: Codable{
       }
 
   }
+
+struct User: Codable {
+    let id: String
+    let username: String
+    let email: String
+    let firstName: String
+    let lastName: String
+    let role: String
+    let achievements: [String]  // Assuming achievements are an array of Strings. Update if different.
+    let created: String
+    let disabled: Bool
+    let favorites: [Favorite]
+
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case username, email, firstName, lastName, role, achievements, created, disabled, favorites
+    }
+}
+struct Favorite: Codable {
+    let venue: String
+    let id: String
+
+    enum CodingKeys: String, CodingKey {
+        case venue
+        case id = "_id"
+    }
+}
