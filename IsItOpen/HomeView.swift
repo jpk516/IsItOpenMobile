@@ -5,79 +5,172 @@
 //  Created by Jimmy Keating on 3/21/24.
 //
 
+
 import SwiftUI
 import CoreLocation
 import MapKit
-import UIKit
 
 struct HomeView: View {
+    @StateObject var venueViewModel = VenueViewModel() // ViewModel to manage venue data
     @State private var showingDetail = false
-    @State private var showingFormSheet = false
-    @State private var selectedRestaurant: Restaurant?
-    
-    // State for form inputs
+    @State private var selectedVenue: Venue?
+
+    // State for form inputs (assuming these are used in some form views you have)
     @State private var isOpen: String = ""
     @State private var atmosphereTags: Set<String> = []
-    @State private var otherDetails: String = ""
-    @State private var venues: [Venue] = []
-    
-    let atmosphereOptions = ["Closing Up", "Open Late", "Upscale", "Budget Friendly", "Rowdy", "Laid Back", "Loud"]
-    
-    let restaurants = [
-        Restaurant(name: "Harpo's", websiteURL: URL(string: "http://harposcomo.com")!, hours: "11AM - 11PM", location: CLLocationCoordinate2D(latitude: 38.95064794213455, longitude: -92.32681850984262), isOpen: true),
-        Restaurant(name: "The Heidelberg", websiteURL: URL(string: "http://theheidelberg.com")!, hours: "10AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.94702278652283, longitude: -92.32745927316932), isOpen: false),
-        Restaurant(name: "Booches Billiard Hall", websiteURL: URL(string: "http://booches.com")!, hours: "11AM - 12AM", location: CLLocationCoordinate2D(latitude: 38.9517, longitude: -92.3286), isOpen: true),
-        Restaurant(name: "Shakespeare’s Pizza", websiteURL: URL(string: "http://shakespeares.com")!, hours: "11AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.9480, longitude: -92.3267), isOpen: true),
-        Restaurant(name: "Addison’s", websiteURL: URL(string: "http://addisonsgrill.com")!, hours: "11AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.9510, longitude: -92.3278), isOpen: false),
-        Restaurant(name: "Flat Branch Pub & Brewing", websiteURL: URL(string: "http://flatbranch.com")!, hours: "11AM - 11PM", location: CLLocationCoordinate2D(latitude: 38.9503, longitude: -92.3289), isOpen: true),
-        Restaurant(name: "Murry’s", websiteURL: URL(string: "http://murrysrestaurant.net")!, hours: "11AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.9482, longitude: -92.3258), isOpen: false),
-        Restaurant(name: "Logboat Brewing Co.", websiteURL: URL(string: "http://logboatbrewing.com")!, hours: "12PM - 11PM", location: CLLocationCoordinate2D(latitude: 38.9605, longitude: -92.3259), isOpen: true),
-        Restaurant(name: "Coley’s American Bistro", websiteURL: URL(string: "http://coleysamericanbistro.com")!, hours: "11AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.9504, longitude: -92.3274), isOpen: true),
-        Restaurant(name: "El Rancho", websiteURL: URL(string: "http://elranchocolumbia.com")!, hours: "11AM - 3AM", location: CLLocationCoordinate2D(latitude: 38.9514, longitude: -92.3288), isOpen: true),
-        Restaurant(name: "Günter Hans", websiteURL: URL(string: "http://gunterhans.com")!, hours: "2PM - 12AM", location: CLLocationCoordinate2D(latitude: 38.9506, longitude: -92.3279), isOpen: true),
-        Restaurant(name: "The Roof", websiteURL: URL(string: "http://theroofcolumbia.com")!, hours: "4PM - 1AM", location: CLLocationCoordinate2D(latitude: 38.9516, longitude: -92.3284), isOpen: true),
-        Restaurant(name: "Tropical Liqueurs", websiteURL: URL(string: "http://tropicalliqueurs.com")!, hours: "12PM - 1AM", location: CLLocationCoordinate2D(latitude: 38.9483, longitude: -92.3296), isOpen: true),
-        Restaurant(name: "Craft Beer Cellar", websiteURL: URL(string: "http://craftbeercellar.com")!, hours: "11AM - 8PM", location: CLLocationCoordinate2D(latitude: 38.9509, longitude: -92.3282), isOpen: false),
-        Restaurant(name: "Room 38 Restaurant & Lounge", websiteURL: URL(string: "http://room-38.com")!, hours: "11AM - 1:30AM", location: CLLocationCoordinate2D(latitude: 38.9505, longitude: -92.3281), isOpen: true),
-        Restaurant(name: "Main Squeeze Natural Foods Café", websiteURL: URL(string: "http://mainsqueezecafe.com")!, hours: "9AM - 7PM", location: CLLocationCoordinate2D(latitude: 38.9513, longitude: -92.3277), isOpen: true),
-        Restaurant(name: "Sycamore", websiteURL: URL(string: "http://sycamorerestaurant.com")!, hours: "11AM - 10PM", location: CLLocationCoordinate2D(latitude: 38.9512, longitude: -92.3285), isOpen: false),
-        Restaurant(name: "Cafe Berlin", websiteURL: URL(string: "http://cafeberlincomo.com")!, hours: "8AM - 2PM", location: CLLocationCoordinate2D(latitude: 38.9521, longitude: -92.3269), isOpen: true)
 
-        // Add more restaurants here
-    ]
     var body: some View {
-        VStack {
-            Text("All venues")
-            
-            List(venues, id:\.id) {venue in
-                Text(venue.name)
-            }
-            .onAppear {
-                // Call the APIManager to fetch data
-                APIManager.fetchDataFromAPI { venues in
-                    // Handle the data received from the API call
-                    self.venues = venues
-                    // Example: Print the names of venues
-                    for venue in venues {
-                        print(venue)
+        NavigationView {
+            List(venueViewModel.venues, id: \.id) { venue in
+                HStack {
+                    Image(systemName: "circle.fill") // Example image, adjust as needed
+                        .foregroundColor(venue.active ? .green : .red)
+
+                    Button(venue.name) {
+                        self.selectedVenue = venue
                     }
-                    
-                    // Example: Update UI elements with the retrieved data
-                    DispatchQueue.main.async {
-                        // Update UI elements
+                    .sheet(item: $selectedVenue) { venue in
+                        VenueDetailView(venue: venue, showingDetail: $showingDetail)
                     }
                 }
             }
+            .navigationTitle("Is it Open?")
+            .onAppear {
+                venueViewModel.loadVenues() // Load venues when the view appears
+            }
         }
     }
+}
+
+
+struct VenueDetailView: View {
+    var venue: Venue
+    @Binding var showingDetail: Bool
+    // State to control the visibility of additional sheets or actions
+    @State private var showingCheckInForm = false
+    
+    var body: some View {
+        VStack {
+            MapView(venue: venue) // Assume MapView is defined elsewhere
+                .edgesIgnoringSafeArea(.top)
+                .frame(height: 300)
+            
+            VStack(alignment: .leading) {
+                Text(venue.name)
+                    .font(.title)
+                //Text("Website: \(venue.website)")
+                Text(formattedHours(venue.hours))
+            }
+            .padding()
+            
+            HStack {
+                Button(action: {
+                    openInMaps(venue: venue)
+                }) {
+                    Text("Open in Maps")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                Button(action: {
+                    showingCheckInForm = true // This triggers the sheet to be presented
+                }) {
+                    Text("Is it open?")
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showingCheckInForm) {
+            // Content of the sheet
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm)
+        }
+        .navigationBarItems(trailing: Button("Back") {
+            showingDetail = false
+        })
+        
+        Button(action: {
+            if let url = URL(string: "tel://\(venue.phone)") {
+                UIApplication.shared.open(url)
+            }
+        }) {
+            Text("Call Venue")
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+        }
+        
+        if let url = URL(string: "http://\(venue.website)"), UIApplication.shared.canOpenURL(url) {
+            Button(action: {
+                UIApplication.shared.open(url)
+            }) {
+                Text("Visit Website")
+                    .padding()
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+        }
+}
+
+    private func formattedHours(_ hours: [Venue.Hours]) -> String {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "h:mm a"  // "5:30 PM"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Assuming times are in UTC
+
+            return hours.map { hour -> String in
+                let openString = hour.open != nil ? dateFormatter.string(from: hour.open!) : "Closed"
+                let closeString = hour.close != nil ? dateFormatter.string(from: hour.close!) : "Closed"
+                return "\(hour.day): \(openString) - \(closeString)"
+            }
+            .joined(separator: "\n")
+        }
+    
+
+    
+
+    private func hourString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
-// Make sure to define the `Restaurant` struct and `MultipleSelectionRow` view as needed in your project
+    private func openInMaps(venue: Venue) {
+        // Extract coordinates from Venue's geo data
+        let coordinate = CLLocationCoordinate2D(latitude: venue.geo.coordinates[1], longitude: venue.geo.coordinates[0])
+        let destination = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+        destination.name = venue.name
+        destination.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+    }
+
+}
+
+// MapView would be a separate SwiftUI view that handles rendering the map based on venue's coordinates.
+struct MapView: View {
+    var venue: Venue
+
+    var body: some View {
+        Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: venue.geo.coordinates[1], longitude: venue.geo.coordinates[0]), span: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.0005))), annotationItems: [venue]) { place in
+            MapPin(coordinate: CLLocationCoordinate2D(latitude: place.geo.coordinates[1], longitude: place.geo.coordinates[0]), tint: .red)
+        }
+        .onAppear {
+            MKMapView.appearance().mapType = .satellite
+        }
+    }
+}
+
+
 struct MultipleSelectionRow: View {
     var title: String
     var isSelected: Bool
     var action: () -> Void
-    
+
     var body: some View {
         Button(action: self.action) {
             HStack {
@@ -92,30 +185,123 @@ struct MultipleSelectionRow: View {
     }
 }
 
-//struct UIViewControllerRepresentation<Content: View>: UIViewControllerRepresentable {
-//    let content: (UIViewController) -> Content
-//    
-//    init(@ViewBuilder content: @escaping (UIViewController) -> Content) {
-//        self.content = content
-//    }
-//    
-//    func makeUIViewController(context: Context) -> UIViewController {
-//        UIViewController()
-//    }
-//    
-//    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-//        let childView = content(uiViewController)
-//        let hostingController = UIHostingController(rootView: childView)
-//        uiViewController.addChild(hostingController)
-//        uiViewController.view.addSubview(hostingController.view)
-//        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            hostingController.view.topAnchor.constraint(equalTo: uiViewController.view.topAnchor),
-//            hostingController.view.leadingAnchor.constraint(equalTo: uiViewController.view.leadingAnchor),
-//            hostingController.view.trailingAnchor.constraint(equalTo: uiViewController.view.trailingAnchor),
-//            hostingController.view.bottomAnchor.constraint(equalTo: uiViewController.view.bottomAnchor)
-//        ])
-//        hostingController.didMove(toParent: uiViewController)
+
+//This is for testing the Check in Button.
+
+//import SwiftUI
+//import CoreLocation
+//import MapKit
+//
+//struct HomeView: View {
+//    @StateObject var venueViewModel = VenueViewModel() // ViewModel to manage venue data
+//    @State private var showingDetail = false
+//    @State private var selectedVenue: Venue?
+//
+//    var body: some View {
+//        NavigationView {
+//            List(venueViewModel.venues, id: \.id) { venue in
+//                HStack {
+//                    Image(systemName: "circle.fill") // Example image, adjust as needed
+//                        .foregroundColor(venue.active ? .green : .red)
+//
+//                    Button(venue.name) {
+//                        self.selectedVenue = venue
+//                    }
+//                    .sheet(item: $selectedVenue) { venue in
+//                        VenueDetailView(venue: venue, showingDetail: $showingDetail)
+//                    }
+//                }
+//            }
+//            .navigationTitle("Is it Open?")
+//            .onAppear {
+//                venueViewModel.loadVenues() // Load venues when the view appears
+//            }
+//        }
 //    }
 //}
-
+//
+//struct VenueDetailView: View {
+//    var venue: Venue
+//    @Binding var showingDetail: Bool
+//    @State private var showingCheckInForm = false
+//    
+//    var body: some View {
+//        VStack {
+//            MapView(venue: venue) // Assume MapView is defined elsewhere
+//                .edgesIgnoringSafeArea(.top)
+//                .frame(height: 300)
+//            
+//            VStack(alignment: .leading) {
+//                Text(venue.name)
+//                    .font(.title)
+//                Text("Hours:\n\(formattedHours(venue.hours))")
+//            }
+//            .padding()
+//            
+//            HStack {
+//                Button(action: {
+//                    openInMaps(venue: venue)
+//                }) {
+//                    Text("Open in Maps")
+//                        .padding()
+//                        .background(Color.blue)
+//                        .foregroundColor(.white)
+//                        .cornerRadius(8)
+//                }
+//                Button(action: {
+//                    showingCheckInForm = true // This triggers the sheet to be presented
+//                }) {
+//                    Text("Check In")
+//                        .padding()
+//                        .background(Color.green)
+//                        .foregroundColor(.white)
+//                        .cornerRadius(8)
+//                }
+//                
+//            }
+//            .padding()
+//        }
+//        .sheet(isPresented: $showingCheckInForm) {
+//            // Content of the sheet
+//            CheckInFormSheet(showingFormSheet: $showingCheckInForm)
+//        }
+//        .navigationBarItems(trailing: Button("Back") {
+//            showingDetail = false
+//        })
+//    }
+//
+//    private func formattedHours(_ hours: [Venue.Hours]) -> String {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "h:mm a"  // "5:30 PM"
+//        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Assuming times are in UTC
+//
+//        return hours.map { hour -> String in
+//            let openString = hour.open != nil ? dateFormatter.string(from: hour.open!) : "Closed"
+//            let closeString = hour.close != nil ? dateFormatter.string(from: hour.close!) : "Closed"
+//            return "\(hour.day): \(openString) - \(closeString)"
+//        }
+//        .joined(separator: "\n")
+//    }
+//
+//    private func openInMaps(venue: Venue) {
+//        // Extract coordinates from Venue's geo data
+//        let coordinate = CLLocationCoordinate2D(latitude: venue.geo.coordinates[1], longitude: venue.geo.coordinates[0])
+//        let destination = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+//        destination.name = venue.name
+//        destination.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+//    }
+//}
+//
+//// MapView would be a separate SwiftUI view that handles rendering the map based on venue's coordinates.
+//struct MapView: View {
+//    var venue: Venue
+//
+//    var body: some View {
+//        Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: venue.geo.coordinates[1], longitude: venue.geo.coordinates[0]), span: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.0005))), annotationItems: [venue]) { place in
+//            MapPin(coordinate: CLLocationCoordinate2D(latitude: place.geo.coordinates[1], longitude: place.geo.coordinates[0]), tint: .red)
+//        }
+//        .onAppear {
+//            MKMapView.appearance().mapType = .satellite
+//        }
+//    }
+//}

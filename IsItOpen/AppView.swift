@@ -14,16 +14,20 @@ struct AppView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            
-            MyViewController()
+            LoginFeedView()
                 .tabItem {
-                    Label("Hot", systemImage: "flame.fill")
+                    Label("Feed", systemImage: "fork.knife")
                 }
-            
             AccountView()
                 .tabItem {
-                    Label("Account", systemImage: "person.fill")
+                    Label("Profile", systemImage: "person.fill")
                 }
+            FavoritesView()
+                .tabItem{
+                    Label("Favorites", systemImage: "heart.fill")
+                }
+            
+
         }
     }
 }
