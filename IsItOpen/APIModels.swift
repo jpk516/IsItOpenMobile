@@ -120,7 +120,16 @@ struct Favorites: Codable, Identifiable{
       }
 
   }
+struct Achievement: Codable {
+    let achievement: String
+    let awarded: String
+    let id: String
 
+    enum CodingKeys: String, CodingKey {
+        case achievement, awarded
+        case id = "_id"
+    }
+}
 struct User: Codable {
     let id: String
     let username: String
@@ -128,7 +137,7 @@ struct User: Codable {
     let firstName: String
     let lastName: String
     let role: String
-    let achievements: [String]  // Assuming achievements are an array of Strings. Update if different.
+    let achievements: [Achievement]  // Assuming achievements are an array of Strings. Update if different.
     let created: String
     let disabled: Bool
     let favorites: [Favorite]
@@ -145,5 +154,34 @@ struct Favorite: Codable {
     enum CodingKeys: String, CodingKey {
         case venue
         case id = "_id"
+    }
+}
+extension Venue {
+    func isOpenNow() -> Bool {
+        let now = Date()
+        let calendar = Calendar.current
+        let dayOfWeek = calendar.weekdaySymbols[calendar.component(.weekday, from: now) - 1].lowercased()
+        
+        guard let todayHours = hours.first(where: { $0.day.lowercased() == dayOfWeek }) else {
+            return false
+        }
+        
+        let currentHour = calendar.component(.hour, from: now)
+        let currentMinute = calendar.component(.minute, from: now)
+        let currentTime = currentHour * 60 + currentMinute
+
+        if let open = todayHours.open, let close = todayHours.close {
+            let openHour = calendar.component(.hour, from: open)
+            let openMinute = calendar.component(.minute, from: open)
+            let closeHour = calendar.component(.hour, from: close)
+            let closeMinute = calendar.component(.minute, from: close)
+
+            let openingTime = openHour * 60 + openMinute
+            let closingTime = closeHour * 60 + closeMinute
+
+            return currentTime >= openingTime && currentTime <= closingTime
+        }
+        
+        return false
     }
 }

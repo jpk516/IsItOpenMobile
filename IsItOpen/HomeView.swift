@@ -25,7 +25,7 @@ struct HomeView: View {
             List(venueViewModel.venues, id: \.id) { venue in
                 HStack {
                     Image(systemName: "circle.fill") // Example image, adjust as needed
-                        .foregroundColor(venue.active ? .green : .red)
+                        .foregroundColor(venue.isOpenNow() ? .green : .red)
 
                     Button(venue.name) {
                         self.selectedVenue = venue
