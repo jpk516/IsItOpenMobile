@@ -201,18 +201,154 @@ struct FavoritesView: View {
     }
 }
 
+//VStack {
+//            // Assume you have a map view or other details to show here
+//            Text(favorite.name).font(.headline)
+//            Text("Details here...").padding()
+//            Button("Close") {
+//                showingDetail = false
+//            }
+//        }
+//    }
 struct FavoritesDetailView: View {
     var favorite: Favorites
     @Binding var showingDetail: Bool
-
+    
+    @State private var showingCheckInForm = false
+    
     var body: some View {
         VStack {
-            // Assume you have a map view or other details to show here
-            Text(favorite.name).font(.headline)
-            Text("Details here...").padding()
-            Button("Close") {
-                showingDetail = false
+            FavMapView(favorite: favorite) // Assume MapView is defined elsewhere
+                .edgesIgnoringSafeArea(.top)
+                .frame(height: 300)
+            
+            VStack(alignment: .leading) {
+                Text(favorite.name)
+                    .font(.title)
+                //Text("Website: \(venue.website)")
+                Text(formattedHours(favorite.hours))
+            }
+            .padding()
+            
+            HStack {
+                Button(action: {
+                    openInMaps(favorite: favorite)
+                }) {
+                    Text("Open in Maps")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                Button(action: {
+                    showingCheckInForm = true // This triggers the sheet to be presented
+                }) {
+                    Text("Favorites")
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showingCheckInForm) {
+            // Content of the sheet
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm)
+        }
+        .navigationBarItems(trailing: Button("Back") {
+            showingDetail = false
+        })
+        
+        Button(action: {
+            if let url = URL(string: "tel://\(favorite.phone)") {
+                UIApplication.shared.open(url)
+            }
+        }) {
+            Text("Call Venue")
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+        }
+        
+        if let url = URL(string: "http://\(favorite.website)"), UIApplication.shared.canOpenURL(url) {
+            Button(action: {
+                UIApplication.shared.open(url)
+            }) {
+                Text("Visit Website")
+                    .padding()
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
             }
         }
     }
+    
+    private func formattedHours(_ hours: [Favorites.Hours]) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"  // "5:30 PM"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Assuming times are in UTC
+        
+        return hours.map { hour -> String in
+            let openString = hour.open != nil ? dateFormatter.string(from: hour.open!) : "Closed"
+            let closeString = hour.close != nil ? dateFormatter.string(from: hour.close!) : "Closed"
+            return "\(hour.day): \(openString) - \(closeString)"
+        }
+        .joined(separator: "\n")
+    }
+    
+    
+    
+    
+    private func hourString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+    
+    private func openInMaps(favorite: Favorites) {
+        // Extract coordinates from Venue's geo data
+        let coordinate = CLLocationCoordinate2D(latitude: favorite.geo.coordinates[1], longitude: favorite.geo.coordinates[0])
+        let destination = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+        destination.name = favorite.name
+        destination.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+    }
 }
+
+
+// MapView would be a separate SwiftUI view that handles rendering the map based on venue's coordinates.
+struct FavMapView: View {
+    var favorite: Favorites
+
+    var body: some View {
+        Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: favorite.geo.coordinates[1], longitude: favorite.geo.coordinates[0]), span: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.0005))), annotationItems: [favorite]) { place in
+            MapPin(coordinate: CLLocationCoordinate2D(latitude: place.geo.coordinates[1], longitude: place.geo.coordinates[0]), tint: .red)
+        }
+        .onAppear {
+            MKMapView.appearance().mapType = .satellite
+        }
+    }
+}
+
+
+//struct MultipleSelectionRow: View {
+//    var title: String
+//    var isSelected: Bool
+//    var action: () -> Void
+//
+//    var body: some View {
+//        Button(action: self.action) {
+//            HStack {
+//                Text(self.title)
+//                Spacer()
+//                if self.isSelected {
+//                    Image(systemName: "checkmark").foregroundColor(.blue)
+//                }
+//            }
+//        }
+//        .foregroundColor(.primary)
+//    }
+//}
+

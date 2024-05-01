@@ -123,18 +123,37 @@ class APIManager {
         // Parse hours data
         var hours = [Venue.Hours]()
         if let hoursData = json["hours"] as? [[String: Any]] {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" // Adjust this format according to your date string format
+            dateFormatter.timeZone = TimeZone(identifier: "America/St.Louis") // Assuming Central Standard Time (CST)
+            
             for hourData in hoursData {
                 let day = hourData["day"] as? String ?? ""
                 let openString = hourData["open"] as? String ?? ""
                 let closeString = hourData["close"] as? String ?? ""
-                let formatter = ISO8601DateFormatter()
-                formatter.formatOptions = [.withInternetDateTime]
-                let openDate = formatter.date(from: openString) ?? Date()
-                let closeDate = formatter.date(from: closeString) ?? Date()
-                let hour = Venue.Hours(day: day, open: openDate, close: closeDate)
-                hours.append(hour)
+                
+                if let openDate = dateFormatter.date(from: openString),
+                   let closeDate = dateFormatter.date(from: closeString) {
+                    let hour = Venue.Hours(day: day, open: openDate, close: closeDate)
+                    hours.append(hour)
+                }
             }
         }
+//        var hours = [Venue.Hours]()
+//        if let hoursData = json["hours"] as? [[String: Any]] {
+//            for hourData in hoursData {
+//                let day = hourData["day"] as? String ?? ""
+//                let openString = hourData["open"] as? String ?? ""
+//                let closeString = hourData["close"] as? String ?? ""
+//                let formatter = ISO8601DateFormatter()
+//                formatter.formatOptions = [.withInternetDateTime]
+//                let openDate = formatter.date(from: openString) ?? Date()
+//                let closeDate = formatter.date(from: closeString) ?? Date()
+//                let hour = Venue.Hours(day: day, open: openDate, close: closeDate)
+//                hours.append(hour)
+////            }
+//            print("Hours data", hours)
+//        }
         
         
         // Parse other properties
@@ -178,18 +197,36 @@ class APIManager {
         // Parse hours data
         var hours = [Favorites.Hours]()
         if let hoursData = json["hours"] as? [[String: Any]] {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" // Adjust this format according to your date string format
+            dateFormatter.timeZone = TimeZone(identifier: "America/St.Louis") // Assuming Central Standard Time (CST)
+            
             for hourData in hoursData {
                 let day = hourData["day"] as? String ?? ""
                 let openString = hourData["open"] as? String ?? ""
                 let closeString = hourData["close"] as? String ?? ""
-                let formatter = ISO8601DateFormatter()
-                formatter.formatOptions = [.withInternetDateTime]
-                let openDate = formatter.date(from: openString) ?? Date()
-                let closeDate = formatter.date(from: closeString) ?? Date()
-                let hour = Favorites.Hours(day: day, open: openDate, close: closeDate)
-                hours.append(hour)
+                
+                if let openDate = dateFormatter.date(from: openString),
+                   let closeDate = dateFormatter.date(from: closeString) {
+                    let hour = Favorites.Hours(day: day, open: openDate, close: closeDate)
+                    hours.append(hour)
+                }
             }
         }
+//        var hours = [Favorites.Hours]()
+//        if let hoursData = json["hours"] as? [[String: Any]] {
+//            for hourData in hoursData {
+//                let day = hourData["day"] as? String ?? ""
+//                let openString = hourData["open"] as? String ?? ""
+//                let closeString = hourData["close"] as? String ?? ""
+//                let formatter = ISO8601DateFormatter()
+//                formatter.formatOptions = [.withInternetDateTime]
+//                let openDate = formatter.date(from: openString) ?? Date()
+//                let closeDate = formatter.date(from: closeString) ?? Date()
+//                let hour = Favorites.Hours(day: day, open: openDate, close: closeDate)
+//                hours.append(hour)
+//            }
+//        }
         
         
         // Parse other properties

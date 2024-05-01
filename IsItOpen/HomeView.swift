@@ -9,6 +9,7 @@
 import SwiftUI
 import CoreLocation
 import MapKit
+import Foundation
 
 struct HomeView: View {
     @StateObject var venueViewModel = VenueViewModel() // ViewModel to manage venue data
@@ -59,7 +60,14 @@ struct VenueDetailView: View {
                 Text(venue.name)
                     .font(.title)
                 //Text("Website: \(venue.website)")
-                Text(formattedHours(venue.hours))
+//                Text(formattedHours(venue.hours))
+                if venue.hours.isEmpty {
+                        Text("Closed")
+                            .padding(.top, 8) // Add some padding to separate from other content
+                    } else {
+                        Text(formattedHours(venue.hours))
+                            .padding(.top, 8) // Add some padding to separate from other content
+                    }
             }
             .padding()
             
@@ -118,28 +126,35 @@ struct VenueDetailView: View {
             }
         }
 }
-
+    
+// Keeper
     private func formattedHours(_ hours: [Venue.Hours]) -> String {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "h:mm a"  // "5:30 PM"
-            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Assuming times are in UTC
-
-            return hours.map { hour -> String in
-                let openString = hour.open != nil ? dateFormatter.string(from: hour.open!) : "Closed"
-                let closeString = hour.close != nil ? dateFormatter.string(from: hour.close!) : "Closed"
-                return "\(hour.day): \(openString) - \(closeString)"
-            }
-            .joined(separator: "\n")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"  // "5:30 PM"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Assuming times are in UTC
+        
+        return hours.map { hour -> String in
+            let openString = hour.open != nil ? dateFormatter.string(from: hour.open!) : "Closed"
+            let closeString = hour.close != nil ? dateFormatter.string(from: hour.close!) : "Closed"
+            return "\(hour.day): \(openString) - \(closeString)"
         }
+        .joined(separator: "\n")
+    }
     
-
     
-
     private func hourString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
+
+    
+
+//    private func hourString(_ date: Date) -> String {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.timeStyle = .short
+//        return dateFormatter.string(from: date)
+//    }
 
     private func openInMaps(venue: Venue) {
         // Extract coordinates from Venue's geo data
