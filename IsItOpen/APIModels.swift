@@ -120,7 +120,16 @@ struct Favorites: Codable, Identifiable{
       }
 
   }
+struct Achievement: Codable {
+    let achievement: String
+    let awarded: String
+    let id: String
 
+    enum CodingKeys: String, CodingKey {
+        case achievement, awarded
+        case id = "_id"
+    }
+}
 struct User: Codable {
     let id: String
     let username: String
@@ -128,7 +137,7 @@ struct User: Codable {
     let firstName: String
     let lastName: String
     let role: String
-    let achievements: [String]  // Assuming achievements are an array of Strings. Update if different.
+    let achievements: [Achievement]  // Assuming achievements are an array of Strings. Update if different.
     let created: String
     let disabled: Bool
     let favorites: [Favorite]
