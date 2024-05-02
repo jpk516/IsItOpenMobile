@@ -49,84 +49,91 @@ struct VenueDetailView: View {
     @Binding var showingDetail: Bool
     // State to control the visibility of additional sheets or actions
     @State private var showingCheckInForm = false
-    
+    var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
     var body: some View {
         VStack {
+            Text(venue.name)
+                .font(.title)
+            
             MapView(venue: venue) // Assume MapView is defined elsewhere
                 .edgesIgnoringSafeArea(.top)
                 .frame(height: 300)
             
             VStack(alignment: .leading) {
-                Text(venue.name)
-                    .font(.title)
+                
                 //Text("Website: \(venue.website)")
-//                Text(formattedHours(venue.hours))
+                //                Text(formattedHours(venue.hours))
                 if venue.hours.isEmpty {
-                        Text("Closed")
-                            .padding(.top, 8) // Add some padding to separate from other content
-                    } else {
-                        Text(formattedHours(venue.hours))
-                            .padding(.top, 8) // Add some padding to separate from other content
-                    }
+                    Text("Closed")
+                        .padding(.top, 8) // Add some padding to separate from other content
+                } else {
+                    Text(formattedHours(venue.hours))
+                    
+                        .padding(.top, 8) // Add some padding to separate from other content
+                }
             }
             .padding()
             
             HStack {
-                Button(action: {
-                    openInMaps(venue: venue)
-                }) {
-                    Text("Open in Maps")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+
                 Button(action: {
                     showingCheckInForm = true // This triggers the sheet to be presented
                 }) {
-                    Text("Is it open?")
-                        .padding()
-                        .background(Color.green)
+                    Label("Is it open?", systemImage: "checkmark.diamond")
                         .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple)
                         .cornerRadius(8)
                 }
+                .buttonStyle(.plain)
+
                 
             }
             .padding()
         }
         .sheet(isPresented: $showingCheckInForm) {
             // Content of the sheet
-            CheckInFormSheet(showingFormSheet: $showingCheckInForm)
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: selectedVenue?.id ?? "") // Pass the venue ID
         }
-        .navigationBarItems(trailing: Button("Back") {
-            showingDetail = false
-        })
-        
-        Button(action: {
-            if let url = URL(string: "tel://\(venue.phone)") {
-                UIApplication.shared.open(url)
-            }
-        }) {
-            Text("Call Venue")
-                .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
-        
-        if let url = URL(string: "http://\(venue.website)"), UIApplication.shared.canOpenURL(url) {
+        //        .navigationBarItems(trailing: Button("Back") {
+        //            showingDetail = false
+        //        })
+        HStack{
             Button(action: {
-                UIApplication.shared.open(url)
+                openInMaps(venue: venue)
             }) {
-                Text("Visit Website")
+                Label("Directions", systemImage: "map.fill")
                     .padding()
-                    .background(Color.orange)
+                    .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
+            Button(action: {
+                if let url = URL(string: "tel://\(venue.phone)") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                Label("Call", systemImage: "phone.fill")
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            
+            if let url = URL(string: "http://\(venue.website)"), UIApplication.shared.canOpenURL(url) {
+                Button(action: {
+                    UIApplication.shared.open(url)
+                }) {
+                    Label("Website", systemImage: "globe")
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+            }
         }
-}
-    
+    }
 // Keeper
     private func formattedHours(_ hours: [Venue.Hours]) -> String {
         let dateFormatter = DateFormatter()

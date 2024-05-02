@@ -26,7 +26,10 @@ struct AppView: View {
                 .tabItem{
                     Label("Favorites", systemImage: "heart.fill")
                 }
-            
+            TagsView()
+                .tabItem{
+                    Label("Tag Test", systemImage: "circle")
+                }
 
         }
     }

@@ -215,7 +215,7 @@ struct FavoritesDetailView: View {
     @Binding var showingDetail: Bool
     
     @State private var showingCheckInForm = false
-    
+    var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
     var body: some View {
         VStack {
             FavMapView(favorite: favorite) // Assume MapView is defined elsewhere
@@ -255,7 +255,7 @@ struct FavoritesDetailView: View {
         }
         .sheet(isPresented: $showingCheckInForm) {
             // Content of the sheet
-            CheckInFormSheet(showingFormSheet: $showingCheckInForm)
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: selectedVenue?.id ?? "") // Pass the venue ID
         }
         .navigationBarItems(trailing: Button("Back") {
             showingDetail = false

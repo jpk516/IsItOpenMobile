@@ -48,52 +48,108 @@ class APIManager {
         task.resume()
     }
     
-    static func fetchDataFromTagAPI(completion: @escaping ([Tags]) -> Void) {
+    static func fetchDataFromTagAPI(completion: @escaping ([Tags]?) -> Void) {
         guard let url = URL(string: "https://server.whatstarted.com/api/tags") else {
             print("Invalid URL")
+            completion(nil)
             return
         }
         
         var tagrequest = URLRequest(url: url)
-        tagrequest.httpMethod = "GET" // Set the request method to GET
+        tagrequest.httpMethod = "GET"
         
         let tagtask = URLSession.shared.dataTask(with: tagrequest) { data, response, error in
-            if let error = error {
-                print("Error: (error)")
+            guard let data = data, let response = response as? HTTPURLResponse, error == nil else {
+                print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                completion(nil)
                 return
             }
             
-            guard let httpTagResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpTagResponse.statusCode) else {
-                print("Invalid response")
-                return
-            }
-            
-            guard let Tagdata = data else {
-                print("No Tag data received")
+            guard (200...299).contains(response.statusCode) else {
+                print("Invalid response: (response.statusCode)")
+                completion(nil)
                 return
             }
             
             do {
-                let jsonArray = try JSONSerialization.jsonObject(with: Tagdata, options: []) as? [[String: Any]]
+                let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]]
                 
                 var tags = [Tags]()
                 if let jsonArray = jsonArray {
                     for item in jsonArray {
-                        // Parse venue data and create Venue objects
                         let tag = parseTag(from: item)
                         tags.append(tag)
                     }
                 }
                 
-                completion(tags) // Pass the data to the completion closure
+                completion(tags)
             } catch {
-                print("Error parsing JSON: (error)")
+                print("Error parsing JSON: (error.localizedDescription)")
+                completion(nil)
             }
         }
         
         tagtask.resume()
     }
+
+    static func postCheckInData(venue: String, comment: String, open: Bool, tags: [String], completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: "https://server.whatstarted.com/api/check-ins") else {
+            print("Invalid URL")
+            completion(false)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "venue": venue,
+            "comment": comment,
+            "open": open,
+            "tags": tags
+        ]
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            request.httpBody = jsonData
+            // Debug: Output the JSON body to the console
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("Posting the following data to /api/check-ins: \(jsonString)")
+            }
+        } catch {
+            print("Error serializing check-in data: \(error)")
+            completion(false)
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let httpResponse = response as? HTTPURLResponse, error == nil else {
+                print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                completion(false)
+                return
+            }
+
+            if (200...299).contains(httpResponse.statusCode) {
+                print("Successfully posted check-in.")
+                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response from server: \(responseString)")
+                }
+                completion(true)
+            } else {
+                print("Failed to post check-in. Status code: \(httpResponse.statusCode)")
+                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Error response from server: \(responseString)")
+                }
+                completion(false)
+            }
+        }
+
+        task.resume()
+    }
+
+
+    
     
     
     static func parseVenue(from json: [String: Any]) -> Venue {
