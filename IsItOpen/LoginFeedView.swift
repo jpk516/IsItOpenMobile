@@ -244,18 +244,22 @@ struct LoginFeedView: View {
                         performLogin()
                     }
 
-                Button("Log In") {
-                    performLogin()
-                }
-                .disabled(username.isEmpty || password.isEmpty)
-                .buttonStyle(RoundedRectangleButtonStyle())
-                .padding()
+                HStack {
+                    // Log In button
+                    Button("Log In") {
+                        performLogin()
+                    }
+                    .disabled(username.isEmpty || password.isEmpty)
+                    .buttonStyle(RoundedRectangleButtonStyle())
+                    .padding()
 
-                Button("Reset Password") {
-                    showingResetPassword = true
+                    // Reset Password button
+                    Button("Reset Password") {
+                        showingResetPassword = true
+                    }
+                    .buttonStyle(RoundedRectangleButtonStyle())
+                    .padding()
                 }
-                .buttonStyle(RoundedRectangleButtonStyle())
-                .padding()
             }
             .padding()
             .sheet(isPresented: $showingResetPassword) {
@@ -269,6 +273,18 @@ struct LoginFeedView: View {
 
     private func performLogin() {
         feedViewModel.authenticate(username: username, password: password)
+    }
+}
+
+// Custom button style for a nicer UI
+struct RoundedRectangleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 
@@ -310,17 +326,6 @@ struct ResetPasswordView: View {
             showAlert = true
             showingResetPassword = false
         }
-    }
-}
-
-struct RoundedRectangleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

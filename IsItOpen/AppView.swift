@@ -14,7 +14,7 @@ struct AppView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            LoginFeedView()
+            FeedView()
                 .tabItem {
                     Label("Feed", systemImage: "fork.knife")
                 }
@@ -26,11 +26,6 @@ struct AppView: View {
                 .tabItem{
                     Label("Favorites", systemImage: "heart.fill")
                 }
-            TagsView()
-                .tabItem{
-                    Label("Tag Test", systemImage: "circle")
-                }
-
         }
     }
 }
