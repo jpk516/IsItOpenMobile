@@ -229,6 +229,34 @@ class APIManager {
         task.resume()
     }
     
+    static func logout(completion: @escaping (Bool) -> Void) {
+            guard let url = URL(string: "https://server.whatstarted.com/api/accounts/logout") else {
+                print("Invalid URL")
+                completion(false)
+                return
+            }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+
+            let task = URLSession.shared.dataTask(with: request) { _, response, error in
+                guard let httpResponse = response as? HTTPURLResponse, error == nil else {
+                    print("Error during logout: \(error?.localizedDescription ?? "Unknown error")")
+                    completion(false)
+                    return
+                }
+
+                if (200...299).contains(httpResponse.statusCode) {
+                    completion(true)
+                } else {
+                    print("Failed to logout. Status code: \(httpResponse.statusCode)")
+                    completion(false)
+                }
+            }
+
+            task.resume()
+        }
+    
     static func parseVenue(from json: [String: Any]) -> Venue {
         // Implement parsing logic to create a Venue object from JSON data
         // This function can be reused if needed in other parts of your code
