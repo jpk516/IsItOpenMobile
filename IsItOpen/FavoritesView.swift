@@ -218,38 +218,37 @@ struct FavoritesDetailView: View {
     var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
     var body: some View {
         VStack {
+            Text(favorite.name)
+                .font(.title)
+            
             FavMapView(favorite: favorite) // Assume MapView is defined elsewhere
                 .edgesIgnoringSafeArea(.top)
                 .frame(height: 300)
             
             VStack(alignment: .leading) {
-                Text(favorite.name)
-                    .font(.title)
-                //Text("Website: \(venue.website)")
-                Text(formattedHours(favorite.hours))
+                if favorite.hours.isEmpty {
+                    Text("Closed")
+                        .padding(.top, 8) // Add some padding to separate from other content
+                } else {
+                    Text(formattedHours(favorite.hours))
+                    
+                        .padding(.top, 8)
+                }
             }
             .padding()
             
             HStack {
                 Button(action: {
-                    openInMaps(favorite: favorite)
-                }) {
-                    Text("Open in Maps")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                Button(action: {
                     showingCheckInForm = true // This triggers the sheet to be presented
                 }) {
-                    Text("Favorites")
-                        .padding()
-                        .background(Color.green)
+                    Label("Is it open?", systemImage: "checkmark.diamond")
                         .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple)
                         .cornerRadius(8)
                 }
-                
+                .buttonStyle(.plain)
             }
             .padding()
         }
@@ -260,30 +259,41 @@ struct FavoritesDetailView: View {
         .navigationBarItems(trailing: Button("Back") {
             showingDetail = false
         })
-        
-        Button(action: {
-            if let url = URL(string: "tel://\(favorite.phone)") {
-                UIApplication.shared.open(url)
-            }
-        }) {
-            Text("Call Venue")
-                .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
-        
-        if let url = URL(string: "http://\(favorite.website)"), UIApplication.shared.canOpenURL(url) {
+        HStack{
             Button(action: {
-                UIApplication.shared.open(url)
+                openInMaps(favorite: favorite)
             }) {
-                Text("Visit Website")
+                Label("Directions", systemImage: "map.fill")
                     .padding()
-                    .background(Color.orange)
+                    .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
+            Button(action: {
+                if let url = URL(string: "tel://\(favorite.phone)") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                Label("Call", systemImage: "phone.fill")
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            
+            if let url = URL(string: "http://\(favorite.website)"), UIApplication.shared.canOpenURL(url) {
+                Button(action: {
+                    UIApplication.shared.open(url)
+                }) {
+                    Label("Website", systemImage: "globe")
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+            }
         }
+        
     }
     
     private func formattedHours(_ hours: [Favorites.Hours]) -> String {
