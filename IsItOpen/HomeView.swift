@@ -12,10 +12,10 @@ import MapKit
 import Foundation
 
 struct HomeView: View {
-    @StateObject var venueViewModel = VenueViewModel() // ViewModel to manage venue data
+    @StateObject var venueViewModel = VenueViewModel()
     @State private var showingDetail = false
     @State private var selectedVenue: Venue?
-
+    
     var body: some View {
         NavigationView {
             List(venueViewModel.venues, id: \.id) { venue in
@@ -59,7 +59,7 @@ struct VenueDetailView: View {
     @Binding var showingDetail: Bool
     // State to control the visibility of additional sheets or actions
     @State private var showingCheckInForm = false
-    var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
+//    var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
     var body: some View {
         VStack {
             Text(venue.name)

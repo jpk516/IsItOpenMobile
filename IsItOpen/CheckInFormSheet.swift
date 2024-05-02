@@ -182,7 +182,7 @@ import SwiftUI
 
 struct CheckInFormSheet: View {
     @Binding var showingFormSheet: Bool
-    var venueId: String?
+    var venueId: String
     // State for form inputs
     @State private var isOpen: Bool = false
     @State private var selectedTags: Set<String> = []
@@ -263,7 +263,11 @@ struct CheckInFormSheet: View {
     }
     
     private func postCheckInData() {
-        APIManager.postCheckInData(venue: venue.Id, comment: otherDetails, open: isOpen, tags: Array(selectedTags)) { success in
+        // Assuming `isOpen` contains "Open" or "Closed" and needs to be converted to Bool
+        let isOpenBool = isOpen
+        
+        // Ensure `venue.id` is lowercase if that's how it's declared
+        APIManager.postCheckInData(venue: venueId, comment: otherDetails, open: isOpenBool, tags: Array(selectedTags)) { success in
             if success {
                 print("Check-in successful")
                 showingFormSheet = false
@@ -272,4 +276,5 @@ struct CheckInFormSheet: View {
             }
         }
     }
+
 }
