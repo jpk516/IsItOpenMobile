@@ -1,45 +1,10 @@
-////
-////  LoginFeedView.swift
-////  IsItOpen
-////
-////  Created by Jimmy Keating on 4/25/24.
-////
 //
-//import SwiftUI
+//  LoginFeedView.swift
+//  IsItOpen
 //
-//struct LoginFeedView: View {
-//    @State private var username: String = ""
-//    @State private var password: String = ""
-//    @StateObject private var feedViewModel = FeedViewModel()
+//  Created by Jimmy Keating on 4/25/24.
 //
-//    var body: some View {
-//        NavigationView {
-//            if feedViewModel.isAuthenticated {
-//                FeedView().environmentObject(feedViewModel)
-//            } else {
-//                loginForm
-//            }
-//        }
-//    }
-//
-//    var loginForm: some View {
-//        Form {
-//            TextField("Username", text: $username)
-//                .autocapitalization(.none)
-//                .disableAutocorrection(true)
-//            SecureField("Password", text: $password)
-//            Button("Log In") {
-//                feedViewModel.authenticate(username: username, password: password)
-//            }
-//            .disabled(username.isEmpty || password.isEmpty)
-//        }
-//        .navigationBarTitle("Log In")
-//    }
-//}
-//
-//
-//import Foundation
-//
+
 class FeedViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var checkIns: [CheckItIn] = []
@@ -197,38 +162,51 @@ struct CheckItIn: Codable, Identifiable {
 //    }
 //
 //    var loginForm: some View {
-//        Form {
-//            Section(header: Text("Please log in to continue")) {
-//                TextField("Username", text: $username)
-//                    .autocapitalization(.none)
-//                    .disableAutocorrection(true)
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                
-//                SecureField("Password", text: $password)
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                
-//                Button("Log In") {
-//                    feedViewModel.authenticate(username: username, password: password)
+//        VStack(spacing: 20) {
+//            // Placeholder logo
+//            Image("Logo") // Placeholder for your logo
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 300, height: 300)
+//
+//            Text("Welcome! Please log in")
+//                .font(.title3)
+//                .foregroundColor(.gray)
+//
+//            // Username input
+//            TextField("Username", text: $username)
+//                .autocapitalization(.none)
+//                .disableAutocorrection(true)
+//                .textFieldStyle(RoundedBorderTextFieldStyle())
+//                .padding(.horizontal)
+//
+//            // Password input
+//            SecureField("Password", text: $password)
+//                .textFieldStyle(RoundedBorderTextFieldStyle())
+//                .padding(.horizontal)
+//                .submitLabel(.done)
+//                .onSubmit {
+//                    performLogin()
 //                }
-//                .disabled(username.isEmpty || password.isEmpty)
-//                .buttonStyle(RoundedRectangleButtonStyle())
+//
+//            // Login button
+//            Button("Log In") {
+//                performLogin()
 //            }
+//            .disabled(username.isEmpty || password.isEmpty)
+//            .buttonStyle(RoundedRectangleButtonStyle())
+//            .padding()
+//
 //        }
-//        .navigationBarTitle("Log In", displayMode: .inline)
+//        .padding()
+//    }
+//
+//    private func performLogin() {
+//        feedViewModel.authenticate(username: username, password: password)
 //    }
 //}
 //
 //// Custom button style for a nicer UI
-//struct RoundedRectangleButtonStyle: ButtonStyle {
-//    func makeBody(configuration: Self.Configuration) -> some View {
-//        configuration.label
-//            .padding()
-//            .background(Color.blue)
-//            .foregroundColor(.white)
-//            .clipShape(RoundedRectangle(cornerRadius: 8))
-//            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-//    }
-//}
 
 import SwiftUI
 
@@ -236,58 +214,57 @@ struct LoginFeedView: View {
     @EnvironmentObject var feedViewModel: FeedViewModel
     @State private var username: String = ""
     @State private var password: String = ""
+    @State private var showingResetPassword = false
+    @State private var alertMessage: String?
+    @State private var showAlert = false
 
     var body: some View {
         NavigationView {
-            VStack {
-                if feedViewModel.isAuthenticated {
-                    FeedView()
-                } else {
-                    loginForm
-                }
-            }
-            .navigationBarHidden(true)
-        }
-    }
+            VStack(spacing: 20) {
+                Image("Logo") // Placeholder for your logo
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
 
-    var loginForm: some View {
-        VStack(spacing: 20) {
-            // Placeholder logo
-            Image("Logo") // Placeholder for your logo
-                .resizable()
-                .scaledToFit()
-                .frame(width: 300, height: 300)
+                Text("Welcome! Please log in")
+                    .font(.title3)
+                    .foregroundColor(.gray)
 
-            Text("Welcome! Please log in")
-                .font(.title3)
-                .foregroundColor(.gray)
+                TextField("Username", text: $username)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
 
-            // Username input
-            TextField("Username", text: $username)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal)
+                SecureField("Password", text: $password)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        performLogin()
+                    }
 
-            // Password input
-            SecureField("Password", text: $password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal)
-                .submitLabel(.done)
-                .onSubmit {
+                Button("Log In") {
                     performLogin()
                 }
+                .disabled(username.isEmpty || password.isEmpty)
+                .buttonStyle(RoundedRectangleButtonStyle())
+                .padding()
 
-            // Login button
-            Button("Log In") {
-                performLogin()
+                Button("Reset Password") {
+                    showingResetPassword = true
+                }
+                .buttonStyle(RoundedRectangleButtonStyle())
+                .padding()
             }
-            .disabled(username.isEmpty || password.isEmpty)
-            .buttonStyle(RoundedRectangleButtonStyle())
             .padding()
-
+            .sheet(isPresented: $showingResetPassword) {
+                ResetPasswordView(showingResetPassword: $showingResetPassword, alertMessage: $alertMessage, showAlert: $showAlert)
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Password Reset"), message: Text(alertMessage ?? "Unknown error"), dismissButton: .default(Text("OK")))
+            }
         }
-        .padding()
     }
 
     private func performLogin() {
@@ -295,7 +272,47 @@ struct LoginFeedView: View {
     }
 }
 
-// Custom button style for a nicer UI
+struct ResetPasswordView: View {
+    @Binding var showingResetPassword: Bool
+    @Binding var alertMessage: String?
+    @Binding var showAlert: Bool
+    @State private var email: String = ""
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Reset Your Password")
+                .font(.headline)
+
+            TextField("Email address", text: $email)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+
+            Button("Send Reset Email") {
+                sendResetEmail()
+            }
+            .disabled(email.isEmpty)
+            
+            .padding()
+        }
+        .padding()
+    }
+
+    private func sendResetEmail() {
+        // Here you would call your API to handle the password reset
+        APIManager.postForgotPassword(email: email) { success in
+            if success {
+                alertMessage = "An email has been sent to reset your password."
+            } else {
+                alertMessage = "Failed to send reset email. Please try again later."
+            }
+            showAlert = true
+            showingResetPassword = false
+        }
+    }
+}
+
 struct RoundedRectangleButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
@@ -307,4 +324,3 @@ struct RoundedRectangleButtonStyle: ButtonStyle {
     }
 }
 
-// Ensure that you have the necessary environment object available in your previews or when you initialize this view.

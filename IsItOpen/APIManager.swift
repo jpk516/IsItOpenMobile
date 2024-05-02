@@ -185,7 +185,49 @@ class APIManager {
             task.resume()
         }
 
+    static let baseUrl = "https://server.whatstarted.com/api"
 
+    static func postForgotPassword(email: String, completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: "\(baseUrl)/accounts/forgot-password") else {
+            print("Invalid URL")
+            completion(false)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "email": email
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("Failed to serialize data: \(error)")
+            completion(false)
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let httpResponse = response as? HTTPURLResponse,
+                  error == nil else {
+                print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                completion(false)
+                return
+            }
+
+            if (200...299).contains(httpResponse.statusCode) {
+                completion(true)
+            } else {
+                print("Failed to post forgot password. Status code: \(httpResponse.statusCode)")
+                completion(false)
+            }
+        }
+
+        task.resume()
+    }
     
     static func parseVenue(from json: [String: Any]) -> Venue {
         // Implement parsing logic to create a Venue object from JSON data
