@@ -16,10 +16,6 @@ struct HomeView: View {
     @State private var showingDetail = false
     @State private var selectedVenue: Venue?
 
-    // State for form inputs (assuming these are used in some form views you have)
-    @State private var isOpen: String = ""
-    @State private var atmosphereTags: Set<String> = []
-
     var body: some View {
         NavigationView {
             List(venueViewModel.venues, id: \.id) { venue in
@@ -29,17 +25,31 @@ struct HomeView: View {
 
                     Button(venue.name) {
                         self.selectedVenue = venue
+                        printVenueDetails(venue) // Print venue details for debugging
                     }
                     .sheet(item: $selectedVenue) { venue in
                         VenueDetailView(venue: venue, showingDetail: $showingDetail)
                     }
                 }
             }
+            .refreshable {
+                venueViewModel.loadVenues() // Refresh and load venues when pulled down
+            }
             .navigationTitle("Is it Open?")
             .onAppear {
                 venueViewModel.loadVenues() // Load venues when the view appears
             }
         }
+    }
+
+    private func printVenueDetails(_ venue: Venue) {
+        print("Selected Venue Details:")
+        print("Name: \(venue.name)")
+        print("ID: \(venue.id)")
+        print("Description: \(venue.description)")
+        print("Open: \(venue.isOpenNow())")
+        print("Location: \(venue.geo.coordinates)")
+        // Add more details as needed
     }
 }
 
@@ -94,7 +104,7 @@ struct VenueDetailView: View {
         }
         .sheet(isPresented: $showingCheckInForm) {
             // Content of the sheet
-            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: selectedVenue?.id ?? "") // Pass the venue ID
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: venue.id)
         }
         //        .navigationBarItems(trailing: Button("Back") {
         //            showingDetail = false
@@ -134,6 +144,7 @@ struct VenueDetailView: View {
             }
         }
     }
+    
 // Keeper
     private func formattedHours(_ hours: [Venue.Hours]) -> String {
         let dateFormatter = DateFormatter()
