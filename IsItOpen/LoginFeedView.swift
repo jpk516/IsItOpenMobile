@@ -176,6 +176,60 @@ struct CheckItIn: Codable, Identifiable {
 }
 
 
+//import SwiftUI
+//
+//struct LoginFeedView: View {
+//    @EnvironmentObject var feedViewModel: FeedViewModel
+//    @State private var username: String = ""
+//    @State private var password: String = ""
+//
+//    var body: some View {
+//        NavigationView {
+//            VStack {
+//                if feedViewModel.isAuthenticated {
+//                    FeedView()
+//                } else {
+//                    loginForm
+//                }
+//            }
+//            .navigationBarHidden(true)
+//        }
+//    }
+//
+//    var loginForm: some View {
+//        Form {
+//            Section(header: Text("Please log in to continue")) {
+//                TextField("Username", text: $username)
+//                    .autocapitalization(.none)
+//                    .disableAutocorrection(true)
+//                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                
+//                SecureField("Password", text: $password)
+//                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                
+//                Button("Log In") {
+//                    feedViewModel.authenticate(username: username, password: password)
+//                }
+//                .disabled(username.isEmpty || password.isEmpty)
+//                .buttonStyle(RoundedRectangleButtonStyle())
+//            }
+//        }
+//        .navigationBarTitle("Log In", displayMode: .inline)
+//    }
+//}
+//
+//// Custom button style for a nicer UI
+//struct RoundedRectangleButtonStyle: ButtonStyle {
+//    func makeBody(configuration: Self.Configuration) -> some View {
+//        configuration.label
+//            .padding()
+//            .background(Color.blue)
+//            .foregroundColor(.white)
+//            .clipShape(RoundedRectangle(cornerRadius: 8))
+//            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+//    }
+//}
+
 import SwiftUI
 
 struct LoginFeedView: View {
@@ -197,24 +251,47 @@ struct LoginFeedView: View {
     }
 
     var loginForm: some View {
-        Form {
-            Section(header: Text("Please log in to continue")) {
-                TextField("Username", text: $username)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                SecureField("Password", text: $password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                Button("Log In") {
-                    feedViewModel.authenticate(username: username, password: password)
+        VStack(spacing: 20) {
+            // Placeholder logo
+            Image("Logo") // Placeholder for your logo
+                .resizable()
+                .scaledToFit()
+                .frame(width: 300, height: 300)
+
+            Text("Welcome! Please log in")
+                .font(.title3)
+                .foregroundColor(.gray)
+
+            // Username input
+            TextField("Username", text: $username)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+
+            // Password input
+            SecureField("Password", text: $password)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+                .submitLabel(.done)
+                .onSubmit {
+                    performLogin()
                 }
-                .disabled(username.isEmpty || password.isEmpty)
-                .buttonStyle(RoundedRectangleButtonStyle())
+
+            // Login button
+            Button("Log In") {
+                performLogin()
             }
+            .disabled(username.isEmpty || password.isEmpty)
+            .buttonStyle(RoundedRectangleButtonStyle())
+            .padding()
+
         }
-        .navigationBarTitle("Log In", displayMode: .inline)
+        .padding()
+    }
+
+    private func performLogin() {
+        feedViewModel.authenticate(username: username, password: password)
     }
 }
 
@@ -229,3 +306,5 @@ struct RoundedRectangleButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
+
+// Ensure that you have the necessary environment object available in your previews or when you initialize this view.
