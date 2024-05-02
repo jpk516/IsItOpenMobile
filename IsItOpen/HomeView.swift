@@ -71,8 +71,6 @@ struct VenueDetailView: View {
             
             VStack(alignment: .leading) {
                 
-                //Text("Website: \(venue.website)")
-                //                Text(formattedHours(venue.hours))
                 if venue.hours.isEmpty {
                     Text("Closed")
                         .padding(.top, 8) // Add some padding to separate from other content
@@ -166,13 +164,6 @@ struct VenueDetailView: View {
         return formatter.string(from: date)
     }
 
-    
-
-//    private func hourString(_ date: Date) -> String {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.timeStyle = .short
-//        return dateFormatter.string(from: date)
-//    }
 
     private func openInMaps(venue: Venue) {
         // Extract coordinates from Venue's geo data
