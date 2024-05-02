@@ -177,6 +177,7 @@ struct FavoritesView: View {
     @StateObject var favoritesViewModel = FavoritesViewModel()
     @State private var showingDetail = false
     @State private var selectedFavorite: Favorites?
+    var selectedVenue: Venue?
 
     var body: some View {
         NavigationView {
@@ -192,6 +193,9 @@ struct FavoritesView: View {
                         FavoritesDetailView(favorite: favorite, showingDetail: $showingDetail)
                     }
                 }
+            }
+            .refreshable {
+                favoritesViewModel.loadFavorites()
             }
             .navigationTitle("Favorites")
             .onAppear {
@@ -215,7 +219,7 @@ struct FavoritesDetailView: View {
     @Binding var showingDetail: Bool
     
     @State private var showingCheckInForm = false
-    var selectedVenue: Venue? // Add this to pass to CheckInFormSheet
+    /*var selectedVenue: Venue?*/ // Add this to pass to CheckInFormSheet
     var body: some View {
         VStack {
             Text(favorite.name)
@@ -254,7 +258,7 @@ struct FavoritesDetailView: View {
         }
         .sheet(isPresented: $showingCheckInForm) {
             // Content of the sheet
-            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: selectedVenue?.id ?? "") // Pass the venue ID
+            CheckInFormSheet(showingFormSheet: $showingCheckInForm, venueId: favorite.id) // Pass the venue ID
         }
         .navigationBarItems(trailing: Button("Back") {
             showingDetail = false
@@ -341,24 +345,4 @@ struct FavMapView: View {
         }
     }
 }
-
-
-//struct MultipleSelectionRow: View {
-//    var title: String
-//    var isSelected: Bool
-//    var action: () -> Void
-//
-//    var body: some View {
-//        Button(action: self.action) {
-//            HStack {
-//                Text(self.title)
-//                Spacer()
-//                if self.isSelected {
-//                    Image(systemName: "checkmark").foregroundColor(.blue)
-//                }
-//            }
-//        }
-//        .foregroundColor(.primary)
-//    }
-//}
 
